@@ -4,17 +4,18 @@ new (class Control {
     #viewC;
 
     constructor() {
-        // Add new div to body
-        const root = d3.select('body').append('div')
-                        .style('position','fixed')
-                        .style('top','0')
-                        .style('left','0')
-                        .style('width', '100%')
-                        .style('height', '100%');
+        d3.csv('../clean_vehicles.csv', (data) => {
+            // Add new div to body
+            const root = d3.select('body').append('div')
+            .style('position','fixed')
+            .style('top','0')
+            .style('left','0')
+            .style('width', '100%')
+            .style('height', '100%');
 
-        this.#viewA = new ViewA(this, root);
-        this.#viewB = new ViewB(this, root);
-        this.#viewC = new ViewC(this, root);
+            this.#viewA = new ViewA(this, root);
+            this.#viewB = new ViewB(this, root);
+        });
     }
 
     Test(str) {

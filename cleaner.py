@@ -8,7 +8,7 @@ df = pd.read_csv('vehicles.csv')
 #print(df.shape)
  
 #Dropping the missing rows.
-df_dropped = df.dropna(how = 'any')
+df_dropped = df.fillna('')
 #print(df_dropped)
 
 df_dropped.to_csv('clean_vehicles.csv')
