@@ -1,7 +1,6 @@
 new (class Control {
     #viewA;
     #viewB;
-    #viewC;
 
     constructor() {
         d3.csv('../clean_vehicles.csv', (data) => {
@@ -13,8 +12,8 @@ new (class Control {
             .style('width', '100%')
             .style('height', '100%');
 
-            this.#viewA = new ViewA(this, root);
-            this.#viewB = new ViewB(this, root);
+            this.#viewA = new ViewA(this, root, data);
+            this.#viewB = new ViewB(this, root, data);
         });
     }
 
@@ -26,6 +25,5 @@ new (class Control {
     Message(str){
         this.#viewA.Hear(str)
         this.#viewB.Hear(str)
-        this.#viewC.Hear(str)
     }
 })()

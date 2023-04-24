@@ -1,6 +1,6 @@
 class ViewA {
     #intraLabel;
-    constructor(con, root) {
+    constructor(con, root, data) {
         this.con = con;
 
         const div = root.append('div')
