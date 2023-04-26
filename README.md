@@ -6,7 +6,7 @@ The Forgotten Semicolon is a group of data enthusiasts who have been working on 
 
 ## Data Sources
 
-The group used two main data sources for the project. The first was a publicly available dataset containing information about car usage. The second was data collected by the group itself, which included additional details about the cars such as make and model.
+The group used a publicly available dataset from Kaggle containing information about car usage. The dataset can be found here: https://www.kaggle.com/austinreese/craigslist-carstrucks-data.
 
 ## Data Cleaning
 
@@ -14,11 +14,10 @@ Before creating the visualization, the group had to clean the data to ensure tha
 
 ## Visualization
 
-The group used Python and its libraries such as Pandas, Matplotlib, and Seaborn to create the visualization. They created a scatter plot that showed the relationship between car usage and different factors such as make and model.
+The group used D3.js and Chart.js to create the visualization. They created a bar chart that showed the distribution of car prices based on make and model. The bar chart was interactive, allowing users to hover over individual bars to view specific details about the car make and model.
 
-The scatter plot was interactive, allowing users to hover over individual data points to view specific details about the car. The group also added additional filters to the visualization, allowing users to filter the data based on factors such as car age and make.
+The group also created a scatter plot that showed the relationship between car price and mileage. The scatter plot was interactive, allowing users to hover over individual data points to view specific details about the car.
 
 ## Conclusion
 
-The Forgotten Semicolon did an excellent job in creating an interactive visualization that allowed users to explore car usage data. The use of Python and its libraries allowed the group to create a visually appealing and interactive scatter plot that was easy to use. Overall, the group's work showcases the power of data visualization in conveying complex information in a simple and intuitive way.
-
+The Forgotten Semicolon did an excellent job in creating an interactive visualization that allowed users to explore car usage data. The use of D3.js and Chart.js allowed the group to create visually appealing and interactive charts that were easy to use. Overall, the group's work showcases the power of data visualization in conveying complex information in a simple and intuitive way.
