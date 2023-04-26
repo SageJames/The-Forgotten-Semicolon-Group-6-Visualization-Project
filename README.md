@@ -16,7 +16,7 @@ Before creating the visualization, the group had to clean the data to ensure tha
 
 The group used D3.js and Chart.js to create the visualization. They created a bar chart that showed the distribution of car prices based on make and model. The bar chart was interactive, allowing users to hover over individual bars to view specific details about the car make and model.
 
-The group also created a scatter plot that showed the relationship between car price and mileage. The scatter plot was interactive, allowing users to hover over individual data points to view specific details about the car.
+The group also created a scatter plot that showed the relationship between car price and condition. The scatter plot was interactive, allowing users to hover over individual data points to view specific details about the car.
 
 ## Conclusion
 
