@@ -19,8 +19,8 @@ class ViewA {
 
         // Create a foreignObject element and append it to the SVG
         var foreignObject = svg.append("foreignObject")
-            .attr("width", 400)
-            .attr("height", 400);
+            .attr("width", "100%")
+            .attr("height", "100%");
 
         // Create a div element that will contain the Chart.js chart
         var chartDiv = foreignObject.append("xhtml:div")
