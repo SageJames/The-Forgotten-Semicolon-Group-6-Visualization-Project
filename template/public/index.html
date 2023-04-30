@@ -13,16 +13,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="viewA.js"></script>
     <script src="viewB.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-heatmap.min.js"></script>
 </head>
 
 <body>
     <script src="control.js"></script>
     <canvas id="myChart"></canvas>
     <script>
-        const dataArr = []
-        d3.csv('reduced_vehicles.csv', (data) => {
-            dataArr.push(data)
-        })
+        d3.csv('reduced_vehicles.csv')
         .then((fullData) => {
             console.log("Data loaded!")
             const con = new Control(fullData)
