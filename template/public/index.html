@@ -19,14 +19,19 @@
     <script src="control.js"></script>
     <canvas id="myChart"></canvas>
     <script>
-        d3.csv('clean_vehicles.csv', (data) => {
-            console.log(data)
-        });
-        fetch('start')
-        .then(res=>res.json())
-        .then(data=>{
-            const con=new Control(data)
+        const dataArr = []
+        d3.csv('reduced_vehicles.csv', (data) => {
+            dataArr.push(data)
         })
+        .then((fullData) => {
+            console.log("Data loaded!")
+            const con = new Control(fullData)
+        });
+        // fetch('start')
+        // .then(res=>res.json())
+        // .then(data=>{
+        //     const con=new Control(data)
+        // })
     </script>
 </body>
 

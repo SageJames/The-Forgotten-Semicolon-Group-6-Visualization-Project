@@ -10,13 +10,9 @@ class Control {
         .style('left','0')
         .style('width', '100%')
         .style('height', '100%');
-        const data = '';
 
         this.#viewA = new ViewA(this, root, data);
-        this.#viewB = new ViewB(this, root, data);
-        // d3.csv('clean_vehicles.csv', (data) => {
-        //     console.log(data)
-        // });
+        this.#viewB = new ViewB(this, root, data); 
     }
 
     Test(str) {
