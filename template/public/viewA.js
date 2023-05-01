@@ -29,7 +29,7 @@ class ViewA {
             .style("height", "100%");
 
         const salesData = data.map(item => {
-            const postingDate = new Date(item.posting_date);
+            const postingDate = new Date(item.posting_date ? item.posting_date : 'December 17, 1995 03:24:00');
             const year = postingDate.getFullYear().toString();
             const state = item.state;
             const price = item.price;

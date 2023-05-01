@@ -76,19 +76,15 @@ class ViewB {
         const barData = {
             labels: groupedData.map((d) => d.x),
             datasets: [{
+                type: 'bar',
                 label: "Total Prices",
                 backgroundColor: "rgba(255, 99, 132, 0.2)",
                 borderColor: "rgba(255,99,132,1)",
                 borderWidth: 1,
                 data: groupedData.map((d) => d.y),
                 yAxisID: "y-axis-1",
-            }],
-        };
-
-        // Set up the line chart data
-        const lineData = {
-            labels: groupedData.map((d) => d.x),
-            datasets: [{
+            }, {
+                type: 'bubble',
                 label: "Average Price",
                 borderColor: "rgba(54, 162, 235, 1)",
                 borderWidth: 2,
@@ -109,25 +105,9 @@ class ViewB {
             .attr("id", "chart-b")
             .node();
         const chart = new Chart(ctx, {
-            type: "bar",
             data: barData,
             options: options,
         });
-
-        // Add the line chart as a second dataset
-        chart.data.datasets.push(lineData.datasets[0]);
-        chart.options.scales.yAxes.push({
-            id: "y-axis-2",
-            type: "linear",
-            display: true,
-            position: "right",
-            ticks: {
-                beginAtZero: true,
-            },
-        });
-
-        // Update the chart
-        chart.update();
 
         const label = svg.append('text')
             .text('View B')
