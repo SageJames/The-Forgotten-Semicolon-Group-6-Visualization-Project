@@ -20,128 +20,114 @@ class ViewB {
 
 
         // Create a foreignObject element and append it to the SVG
-        var foreignObject = svg.append("foreignObject")
+        var foreignObject = svg.append("canvas")
+            .attr("id", "chart-b")
             .attr("width", "100%")
             .attr("height", "100%");
 
-        // Create a div element that will contain the Chart.js chart
-        var chartDiv = foreignObject.append("xhtml:div")
-            .attr("id", "chart-container")
-            .style("width", "100%")
-            .style("height", "100%");
-
         const carData = data.map(item => {
-            const postingDate = new Date(item.posting_date);
-            const year = postingDate;
-            const state = item.state;
+            const postingDate = new Date(item.posting_date ? item.posting_date : 'December 17, 1995 03:24:00');
+            const label = postingDate.toLocaleString('default', { month: 'short', year: 'numeric' });
             const price = item.price;
 
             return {
-                x: year,
+                x: label,
                 y: price,
             };
         });
 
-        const groupedData = carData.reduce((acc, item) => {
-            const key = `${item.x}-${item.y}`;
-            const index = acc.findIndex(d => d.key === key);
-            if (index >= 0) {
-                acc[index].y += item.y;
-                acc[index].count++;
+        // Sums up all of the prices with the same time value
+        const sum = {};
+
+        for (const { x, y } of carData) {
+            if (x in sum) {
+                sum[x] += y;
             } else {
-                acc.push({
-                    key,
-                    x: item.x,
-                    y: item.y,
-                    count: 1
-                });
+                sum[x] = y;
             }
-            return acc;
-        }, []);
+        }
 
-        console.log(groupedData)
-        // Find all unique years in the data
-        //const uniqueYears = [...new Set(carData.map((d) => d.x))];
-
-        // Get the total price for each year
-        // const pricesByYear = uniqueYears.map((year) => {
-        //     const prices = carData
-        //         .filter((d) => d.x === year)
-        //         .map((d) => d.y)
-        //         .reduce((sum, price) => sum + price, 0);
-        //     return { x: year, y: prices };
-        // });
-
-        // console.log(pricesByYear)
+        // Consolidates all of the data points back in the correct format
+        const groupedData = []
+        for (let [key, value] of Object.entries(sum)) {
+            groupedData.push({
+                x: key,
+                y: value
+            })
+        }
 
         // Set up the chart options
         const options = {
             responsive: true,
             scales: {
-                xAxes: [
-                    {
-                        type: "category",
-                        labels: carData.x,
+                y: {
+                    id: "y-axis-1",
+                    type: "linear",
+                    display: true,
+                    position: "left",
+                    ticks: {
+                        beginAtZero: true,
                     },
-                ],
+                }
             },
         };
 
         // Set up the bar chart data
         const barData = {
-            labels: carData.x,
-            datasets: [
-                {
-                    label: "Total Prices",
-                    backgroundColor: "rgba(255, 99, 132, 0.2)",
-                    borderColor: "rgba(255,99,132,1)",
-                    borderWidth: 1,
-                    data: carData.map((d) => d.y),
-                    yAxisID: "y-axis-1",
-                },
-            ],
+            labels: groupedData.map((d) => d.x),
+            datasets: [{
+                label: "Total Prices",
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255,99,132,1)",
+                borderWidth: 1,
+                data: groupedData.map((d) => d.y),
+                yAxisID: "y-axis-1",
+            }],
         };
 
         // Set up the line chart data
         const lineData = {
-            labels: carData.x,
-            datasets: [
-                {
-                    label: "Average Price",
-                    borderColor: "rgba(54, 162, 235, 1)",
-                    borderWidth: 2,
-                    fill: false,
-                    data: carData.map((d) => {
-                        const count = carData.filter((car) => car.x === d.x).length;
-                        return count > 0 ? d.y / count : 0;
-                    }),
-                    yAxisID: "y-axis-2",
-                },
-            ],
+            labels: groupedData.map((d) => d.x),
+            datasets: [{
+                label: "Average Price",
+                borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 2,
+                fill: false,
+                data: groupedData.map((d) => {
+                    const count = carData.filter((car) => car.x === d.x).length;
+                    return count > 0 ? d.y / count : 0;
+                }),
+                yAxisID: "y-axis-2",
+            }],
         };
 
         // Create the chart
-        const ctx = document.getElementById("chart-container").getContext("2d");
-        const chart = new Chart(chartDiv, {
+        const ctx = svg.append("foreignObject")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .append("xhtml:canvas")
+            .attr("id", "chart-b")
+            .node();
+        const chart = new Chart(ctx, {
             type: "bar",
             data: barData,
             options: options,
         });
 
         // Add the line chart as a second dataset
-        // chart.data.datasets.push(lineData.datasets[0]);
-        // chart.options.scales.yAxes.push({
-        //     id: "y-axis-2",
-        //     type: "linear",
-        //     display: true,
-        //     position: "right",
-        //     ticks: {
-        //         beginAtZero: true,
-        //     },
-        // });
+        chart.data.datasets.push(lineData.datasets[0]);
+        chart.options.scales.yAxes.push({
+            id: "y-axis-2",
+            type: "linear",
+            display: true,
+            position: "right",
+            ticks: {
+                beginAtZero: true,
+            },
+        });
 
-        // // Update the chart
-        // chart.update();
+        // Update the chart
+        chart.update();
 
         const label = svg.append('text')
             .text('View B')

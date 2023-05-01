@@ -11,7 +11,7 @@ class Control {
         .style('width', '100%')
         .style('height', '100%');
 
-        //this.#viewA = new ViewA(this, root, data);
+        this.#viewA = new ViewA(this, root, data);
         this.#viewB = new ViewB(this, root, data); 
     }
 
