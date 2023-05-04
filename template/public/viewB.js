@@ -1,135 +1,123 @@
 class ViewB {
-    #intraLabel;
-    constructor(con, root, data) {
-        this.con = con;
+  #intraLabel;
+  constructor(con, root, data) {
+    this.con = con;
 
-        const div = root.append('div')
-            .style('position', 'fixed')
-            .style('top', '0')
-            .style('right', '0')
-            .style('width', '50%')
-            .style('height', '50%');
+    const div = root
+      .append("div")
+      .style("position", "fixed")
+      .style("top", "0")
+      .style("right", "0")
+      .style("width", "50%")
+      .style("height", "100%")
+      .style("overflow", "scroll");
 
+    const svg = div
+      .append("svg")
+      .style("position", "relative")
+      .style("width", "200%")
+      .style("height", "200%");
 
-        const svg = div.append('svg')
-            .style('position', 'fixed')
-            .style('top', '0')
-            .style('right', '0')
-            .style('width', '50%')
-            .style('height', '50%');
+    // Group the data by year and calculate the average price and condition for each year
+    const yearData = d3.group(data, (d) => d.year);
+    const yearAverages = Array.from(yearData, ([year, cars]) => ({
+      year,
+      averagePrice: d3.mean(cars, (d) => d.price),
+      averageCondition: d3.mean(cars, (d) => d.condition),
+    }));
 
+    // Create scales for the x and y axes
+    const xScale = d3
+      .scaleBand()
+      .domain(yearAverages.map((d) => d.year))
+      .range([0, innerWidth])
+      .paddingInner(0.05) // add 20% padding between the bars
+      .paddingOuter(0.5) // add 10% padding to the outer edges of the scale
+      .padding(0.5);
 
-        // Create a foreignObject element and append it to the SVG
-        var foreignObject = svg.append("canvas")
-            .attr("id", "chart-b")
-            .attr("width", "100%")
-            .attr("height", "100%");
+    // Adjust the range of yScale to fit the increased height
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(yearAverages, (d) => d.averagePrice)])
+      .range([innerHeight * 0.8, 0]);
 
-        const carData = data.map(item => {
-            const postingDate = new Date(item.posting_date ? item.posting_date : 'December 17, 1995 03:24:00');
-            const label = postingDate.toLocaleString('default', { month: 'short', year: 'numeric' });
-            const price = item.price;
+    // Add the x-axis to the bar chart
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${innerHeight})`)
+      .call(d3.axisBottom(xScale));
 
-            return {
-                x: label,
-                y: price,
-            };
-        });
+    // Add the y-axis to the bar chart
+    svg.append("g").call(d3.axisLeft(yScale));
 
-        // Sums up all of the prices with the same time value
-        const sum = {};
+    // Add the bars to the bar chart
+    svg
+      .selectAll("rect")
+      .data(yearAverages)
+      .enter()
+      .append("rect")
+      .attr("x", (d) => xScale(d.year))
+      .attr("y", (d) => yScale(d.averagePrice))
+      .attr("width", xScale.bandwidth())
+      .attr("height", (d) => innerHeight - yScale(d.averagePrice))
+      .attr("fill", "#69b3a2");
 
-        for (const { x, y } of carData) {
-            if (x in sum) {
-                sum[x] += y;
-            } else {
-                sum[x] = y;
-            }
-        }
+    // Add a hover effect to the bars in the bar chart
+    svg
+      .selectAll("rect")
+      .on("mouseover", function (d) {
+        d3.select(this)
+          .append("text")
+          .attr("fill", "black")
+          .text(
+            `Year: ${d.year}, Avg. Price: $${d3.format(",")(
+              Math.round(d.averagePrice)
+            )}, Avg. Condition: ${Math.round(d.averageCondition)}%`
+          );
 
-        // Consolidates all of the data points back in the correct format
-        const groupedData = []
-        for (let [key, value] of Object.entries(sum)) {
-            groupedData.push({
-                x: key,
-                y: value
-            })
-        }
+        console.log(
+          `Year: ${d.year}, Avg. Price: ${d3.format(",")(
+            Math.round(d.averagePrice)
+          )}, Avg. Condition: ${Math.round(d.averageCondition)}`
+        );
+        d3.select(this).attr("fill", "#ff9800");
+      })
 
-        // Set up the chart options
-        const options = {
-            responsive: true,
-            scales: {
-                y: {
-                    id: "y-axis-1",
-                    type: "linear",
-                    display: true,
-                    position: "left",
-                    ticks: {
-                        beginAtZero: true,
-                    },
-                }
-            },
-        };
+      .on("mouseout", function (d) {
+        d3.select(this).select("text").remove();
+        d3.select(this).attr("fill", "#69b3a2");
+      });
 
-        // Set up the bar chart data
-        const barData = {
-            labels: groupedData.map((d) => d.x),
-            datasets: [{
-                type: 'bar',
-                label: "Total Prices",
-                backgroundColor: "rgba(255, 99, 132, 0.2)",
-                borderColor: "rgba(255,99,132,1)",
-                borderWidth: 1,
-                data: groupedData.map((d) => d.y),
-                yAxisID: "y-axis-1",
-            }, {
-                type: 'bubble',
-                label: "Average Price",
-                borderColor: "rgba(54, 162, 235, 1)",
-                borderWidth: 2,
-                fill: false,
-                data: groupedData.map((d) => {
-                    const count = carData.filter((car) => car.x === d.x).length;
-                    return count > 0 ? d.y / count : 0;
-                }),
-                yAxisID: "y-axis-2",
-            }],
-        };
+    // Add a label to the x-axis
+    svg
+      .append("text")
+      .attr("x", innerWidth / 2)
+      .attr("y", innerHeight + 60) // increase y-coordinate to avoid overlapping with the bars
+      .attr("text-anchor", "middle")
+      .text("Year");
 
-        // Create the chart
-        const ctx = svg.append("foreignObject")
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .append("xhtml:canvas")
-            .attr("id", "chart-b")
-            .node();
-        const chart = new Chart(ctx, {
-            data: barData,
-            options: options,
-        });
+    // Add a label to the y-axis
+    svg
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -innerHeight / 2)
+      .attr("y", -45) // adjust y-coordinate to center the label
+      .attr("text-anchor", "middle")
+      .text("Average Price");
 
-        const label = svg.append('text')
-            .text('View B')
-            .style('fill', 'white')
-            .style('font-size', '50')
-            .attr('y', '215')
-            .attr('x', '170')
-            .on('click', () => {
-                this.con.Message(`View B was clicked`);
-            });
-
-        this.#intraLabel = svg.append('text')
-            .text(this.name)
-            .style('fill', 'black')
-            .style('font-size', '20')
-            .attr('y', '260')
-            .attr('x', '170')
-            .on('click', () => {
-                this.con.Message(`View B was clicked`);
-            });
-    }
-    Hear(str) {
-        this.#intraLabel.text(str);
-    }
+    // Add a label to the bars
+    svg
+      .selectAll(".bar-label")
+      .data(yearAverages)
+      .enter()
+      .append("text")
+      .attr("class", "bar-label")
+      .attr("x", (d) => xScale(d.year) + xScale.bandwidth() / 2)
+      .attr("y", (d) => yScale(d.averagePrice) - 10)
+      .attr("text-anchor", "middle")
+      .text((d) => `$${d3.format(",")(Math.round(d.averagePrice))}`);
+  }
+  Hear(str) {
+    this.#intraLabel.text(str);
+  }
 }

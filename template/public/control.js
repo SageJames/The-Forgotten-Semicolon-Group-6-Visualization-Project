@@ -14,11 +14,7 @@ class Control {
         this.#viewA = new ViewA(this, root, data);
         this.#viewB = new ViewB(this, root, data); 
     }
-
-    Test(str) {
-        console.log(str);
-    }
-
+    
     //Let other views know that a view has been clicked
     Message(str){
         this.#viewA.Hear(str)
