@@ -1,5 +1,6 @@
 class ViewB {
   #intraLabel;
+  clicked = false;
   constructor(con, root, data) {
     this.con = con;
 
@@ -79,8 +80,24 @@ class ViewB {
       })
 
       .on("mouseout", function (d) {
-        d3.select(this).attr("fill", "#69b3a2");
+        if (!this.clicked) {
+          d3.select(this).attr("fill", "#69b3a2");
+        }
+      })
+      .on("click", function (d) {
+        // Highlight the clicked bar
+        d3.select(this).attr("fill", "lightblue");
+
+        // If a rect is already clicked, deselect it
+        if (this.clicked) {
+          d3.select(this).attr("fill", "#69b3a2");
+        } else {
+          // Call con.bToA with the average condition
+          con.bToA(revconditionMap[d.target.__data__.averageCondition]);
+        }
+        this.clicked = !this.clicked;
       });
+
 
     // Add a label to the x-axis
     svg
@@ -124,15 +141,11 @@ class ViewB {
       .on("mouseout", function (d) {
         d3.select(this).text((d) => `${d3.format(",")(Math.round(d.averagePrice))}`)
       })
-      .on("click", function(d) {
-        // Highlight the clicked bar
-        d3.select(this)
-          .attr("fill", "orange");
-    
+      .on("click", function (d) {
         // Call con.bToA with the average condition
-        con.bToA(revconditionMap[d.averageCondition]);
+        con.bToA(revconditionMap[d.target.__data__.averageCondition]);
+        this.clicked = !this.clicked;
       });
-    ;
   }
   Hear(str) {
     this.#intraLabel.text(str);

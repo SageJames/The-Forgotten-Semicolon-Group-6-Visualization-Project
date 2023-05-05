@@ -93,10 +93,12 @@ class ViewA {
             .text("Region with Average Car Condition Heat Map");
     }
 
-
-
     Hear(str) {
         this.#intraLabel.text(str);
+    }
+
+    Filter(str) {
+        console.log(str);
     }
 
 }

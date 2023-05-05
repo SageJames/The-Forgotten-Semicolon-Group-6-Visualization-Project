@@ -17,7 +17,11 @@ class Control {
 
     //Let other views know that a view has been clicked
     Message(str) {
-        this.#viewA.Hear(str)
-        this.#viewB.Hear(str)
+        this.#viewA.Hear(str);
+        this.#viewB.Hear(str);
+    }
+
+    bToA(str) {
+        this.#viewA.Filter(str);
     }
 }
