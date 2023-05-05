@@ -16,15 +16,34 @@ class ViewB {
       .append("svg")
       .style("position", "relative")
       .style("width", "200%")
-      .style("height", "200%");
+      .style("height", "800px");
+
+    const conditionMap = {
+      "new": 5,
+      "like new": 4,
+      "excellent": 3,
+      "good": 2,
+      "fair": 1,
+      "salvage": 0
+    };
+
+    const revconditionMap = {
+      "5": "new",
+      "4": "like new",
+      "3": "excellent",
+      "2": "good",
+      "1": "fair",
+      "0": "salvage"
+    };
 
     // Group the data by year and calculate the average price and condition for each year
     const yearData = d3.group(data, (d) => d.year);
     const yearAverages = Array.from(yearData, ([year, cars]) => ({
       year,
       averagePrice: d3.mean(cars, (d) => d.price),
-      averageCondition: d3.mean(cars, (d) => d.condition),
+      averageCondition: d3.mode(cars, (d) => conditionMap[d.condition]),
     }));
+
 
     // Create scales for the x and y axes
     const xScale = d3
@@ -38,19 +57,23 @@ class ViewB {
     // Adjust the range of yScale to fit the increased height
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(yearAverages, (d) => d.averagePrice)])
-      .range([innerHeight * 0.8, 0]);
+      .domain([5000, d3.max(yearAverages, (d) => d.averagePrice) * 1.1])
+      .range([innerHeight * 0.9, 0]);
 
     // Add the x-axis to the bar chart
+    // Add a label to the x-axis
     svg
-      .append("g")
-      .attr("transform", `translate(0, ${innerHeight})`)
-      .call(d3.axisBottom(xScale));
+      .append("text")
+      .attr("class", "axis-label") // add class here
+      .attr("x", innerWidth / 2)
+      .attr("y", innerHeight + 80) // adjust y-coordinate here
+      .attr("text-anchor", "middle")
+      .text("Year");
 
     // Add the y-axis to the bar chart
     svg.append("g").call(d3.axisLeft(yScale));
 
-    // Add the bars to the bar chart
+    // Add the bars to the bar chart and add some space between the bars
     svg
       .selectAll("rect")
       .data(yearAverages)
@@ -58,50 +81,33 @@ class ViewB {
       .append("rect")
       .attr("x", (d) => xScale(d.year))
       .attr("y", (d) => yScale(d.averagePrice))
-      .attr("width", xScale.bandwidth())
-      .attr("height", (d) => innerHeight - yScale(d.averagePrice))
-      .attr("fill", "#69b3a2");
-
-    // Add a hover effect to the bars in the bar chart
-    svg
-      .selectAll("rect")
+      .attr("width", xScale.bandwidth() * 2) // increase the width of the bars
+      .attr("height", (d) => innerHeight * 0.9 - yScale(d.averagePrice)) // adjust the height of the bars
+      .attr("fill", "#69b3a2")
       .on("mouseover", function (d) {
-        d3.select(this)
-          .append("text")
-          .attr("fill", "black")
-          .text(
-            `Year: ${d.year}, Avg. Price: $${d3.format(",")(
-              Math.round(d.averagePrice)
-            )}, Avg. Condition: ${Math.round(d.averageCondition)}%`
-          );
-
-        console.log(
-          `Year: ${d.year}, Avg. Price: ${d3.format(",")(
-            Math.round(d.averagePrice)
-          )}, Avg. Condition: ${Math.round(d.averageCondition)}`
-        );
         d3.select(this).attr("fill", "#ff9800");
       })
 
       .on("mouseout", function (d) {
-        d3.select(this).select("text").remove();
         d3.select(this).attr("fill", "#69b3a2");
       });
 
     // Add a label to the x-axis
     svg
       .append("text")
+      .attr("class", "axis-label") // add class here
       .attr("x", innerWidth / 2)
-      .attr("y", innerHeight + 60) // increase y-coordinate to avoid overlapping with the bars
+      .attr("y", innerHeight + 60)
       .attr("text-anchor", "middle")
       .text("Year");
 
     // Add a label to the y-axis
     svg
       .append("text")
+      .attr("class", "axis-label") // add class here
       .attr("transform", "rotate(-90)")
       .attr("x", -innerHeight / 2)
-      .attr("y", -45) // adjust y-coordinate to center the label
+      .attr("y", -45)
       .attr("text-anchor", "middle")
       .text("Average Price");
 
@@ -112,10 +118,24 @@ class ViewB {
       .enter()
       .append("text")
       .attr("class", "bar-label")
-      .attr("x", (d) => xScale(d.year) + xScale.bandwidth() / 2)
-      .attr("y", (d) => yScale(d.averagePrice) - 10)
+      .attr("x", (d) => xScale(d.year) + xScale.bandwidth() * 4)
+      .attr("y", (d) => yScale(d.averagePrice))
       .attr("text-anchor", "middle")
-      .text((d) => `$${d3.format(",")(Math.round(d.averagePrice))}`);
+      .attr(
+        "transform",
+        (d) =>
+          `rotate(-90, ${xScale(d.year) + xScale.bandwidth() / 2}, ${yScale(d.averagePrice) - 10
+          })`
+      ) // add rotation to the labels
+      .text((d) => `$${d3.format(",")(Math.round(d.averagePrice))}`)
+      .on("mouseover", function (d) {
+        d3.select(this).text((d) => revconditionMap[d.averageCondition]);
+      })
+
+      .on("mouseout", function (d) {
+        d3.select(this).text((d) => `${d3.format(",")(Math.round(d.averagePrice))}`)
+      });
+    ;
   }
   Hear(str) {
     this.#intraLabel.text(str);
