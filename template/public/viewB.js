@@ -60,16 +60,6 @@ class ViewB {
       .domain([5000, d3.max(yearAverages, (d) => d.averagePrice) * 1.1])
       .range([innerHeight * 0.9, 0]);
 
-    // Add the x-axis to the bar chart
-    // Add a label to the x-axis
-    svg
-      .append("text")
-      .attr("class", "axis-label") // add class here
-      .attr("x", innerWidth / 2)
-      .attr("y", innerHeight + 80) // adjust y-coordinate here
-      .attr("text-anchor", "middle")
-      .text("Year");
-
     // Add the y-axis to the bar chart
     svg.append("g").call(d3.axisLeft(yScale));
 
@@ -97,7 +87,7 @@ class ViewB {
       .append("text")
       .attr("class", "axis-label") // add class here
       .attr("x", innerWidth / 2)
-      .attr("y", innerHeight + 60)
+      .attr("y", innerHeight)
       .attr("text-anchor", "middle")
       .text("Year");
 
@@ -106,8 +96,8 @@ class ViewB {
       .append("text")
       .attr("class", "axis-label") // add class here
       .attr("transform", "rotate(-90)")
-      .attr("x", -innerHeight / 2)
-      .attr("y", -45)
+      .attr("x", -innerHeight / 3)
+      .attr("y", 20)
       .attr("text-anchor", "middle")
       .text("Average Price");
 
