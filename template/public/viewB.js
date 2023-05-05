@@ -17,7 +17,7 @@ class ViewB {
       .append("svg")
       .style("position", "relative")
       .style("width", "200%")
-      .style("height", "500px");
+      .style("height", "800px");
 
     const conditionMap = {
       "new": 5,
@@ -58,7 +58,7 @@ class ViewB {
     // Adjust the range of yScale to fit the increased height
     const yScale = d3
       .scaleLinear()
-      .domain([5000, d3.max(yearAverages, (d) => d.averagePrice) * 1.3])
+      .domain([5000, d3.max(yearAverages, (d) => d.averagePrice) * 1.2])
       .range([innerHeight * 0.9, 0]);
 
     // Add the y-axis to the bar chart
@@ -87,10 +87,11 @@ class ViewB {
       .on("click", function (d) {
         // Highlight the clicked bar
         d3.select(this).attr("fill", "lightblue");
-
         // If a rect is already clicked, deselect it
         if (this.clicked) {
           d3.select(this).attr("fill", "#69b3a2");
+          // Call con.bToA with a blank string
+          con.bToA("");
         } else {
           // Call con.bToA with the average condition
           con.bToA(revconditionMap[d.target.__data__.averageCondition]);
@@ -142,8 +143,13 @@ class ViewB {
         d3.select(this).text((d) => `${d3.format(",")(Math.round(d.averagePrice))}`)
       })
       .on("click", function (d) {
-        // Call con.bToA with the average condition
-        con.bToA(revconditionMap[d.target.__data__.averageCondition]);
+        if (this.clicked) {
+          con.bToA("");
+        }
+        else {
+          // Call con.bToA with the average condition
+          con.bToA(revconditionMap[d.target.__data__.averageCondition]);
+        }
         this.clicked = !this.clicked;
       });
   }

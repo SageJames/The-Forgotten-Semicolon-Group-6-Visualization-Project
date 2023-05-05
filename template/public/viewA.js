@@ -1,5 +1,9 @@
 class ViewA {
     #intraLabel;
+    filter = "";
+    averages;
+    svg;
+
     constructor(con, root, data) {
         this.con = con;
         this.#intraLabel = d3.select("#label"); // assign a private variable for later use
@@ -47,6 +51,7 @@ class ViewA {
             region,
             average: d3.mode(cars, (d) => conditionMap[d.condition]),
         }));
+        this.averages = regionAverages;
 
         // create a scale for the color of the heatmap based on the average car condition
         const colorScale = d3
@@ -60,7 +65,17 @@ class ViewA {
         // create a rectangle for each region in the heatmap
         svg
             .selectAll("rect")
-            .data(regionAverages)
+            .data(() => {
+                return regionAverages.filter((dp) => {
+                    if (this.filter.length === 0) {
+                        return dp;
+                    }
+                    else {
+                        return revconditionMap[dp.average] === this.filter;
+                    }
+                }
+                )
+            })
             .enter()
             .append("rect")
             .attr("x", (d, i) => (i % 18) * 40)
@@ -87,10 +102,12 @@ class ViewA {
         // add a title to the heatmap
         svg
             .append("text")
-            .attr("x", "50%")
+            .attr("x", "40%")
             .attr("y", "90%")
             .attr("text-anchor", "middle")
             .text("Region with Average Car Condition Heat Map");
+
+        this.svg = svg;
     }
 
     Hear(str) {
@@ -98,7 +115,86 @@ class ViewA {
     }
 
     Filter(str) {
-        console.log(str);
+        this.filter = str;
+
+        const revconditionMap = {
+            "5": "new",
+            "4": "like new",
+            "3": "excellent",
+            "2": "good",
+            "1": "fair",
+            "0": "salvage"
+        };
+
+        // create a scale for the color of the heatmap based on the average car condition
+        const colorScale = d3
+            .scaleSequential()
+            .interpolator(d3.interpolateViridis)
+            .domain([
+                d3.min(this.averages, (d) => d.average),
+                d3.max(this.averages, (d) => d.average),
+            ]);
+
+        this.svg
+            .selectAll("rect")
+            .remove()
+
+        // create a rectangle for each region in the heatmap
+        this.svg
+            .selectAll("rect")
+            .data(() => {
+                return this.averages.filter((dp) => {
+                    if (this.filter.length === 0) {
+                        return dp;
+                    }
+                    else {
+                        return revconditionMap[dp.average] === this.filter;
+                    }
+                }
+                )
+            })
+            .enter()
+            .append("rect")
+            .attr("x", (d, i) => (i % 18) * 40)
+            .attr("y", (d, i) => Math.floor(i / 18) * 40)
+            .attr("width", 30)
+            .attr("height", 30)
+            .attr("fill", (d) => colorScale(d.average))
+            .on("mouseover", function (d) {
+                // add tooltip text when the mouse hovers over a rectangle
+                d3.select(this)
+                    .append("text")
+                    .attr("x", (d, i) => (i % 18) * 40)
+                    .attr("y", (d, i) => Math.floor(i / 18) * 40)
+                    .attr("fill", "black")
+                    .text((d) => d.region);
+            })
+            .on("mouseout", function (d) {
+                // remove tooltip text when the mouse moves away from a rectangle
+                d3.select(this).select("text").remove();
+            })
+            .append("title") // add a title element for the tooltip
+            .text((d) => `${d.region}, Avg. Condition: ${revconditionMap[d.average]}`); // set the title text to the region and average condition
+    }
+
+    filterData(data, condition) {
+        const revconditionMap = {
+            "5": "new",
+            "4": "like new",
+            "3": "excellent",
+            "2": "good",
+            "1": "fair",
+            "0": "salvage"
+        };
+        if (!condition) {
+            // If the condition is not defined, return all data
+            return data;
+        } else {
+            // Filter the data based on the condition
+            return data.filter(function (d) {
+                return revconditionMap[d.average] === condition;
+            });
+        }
     }
 
 }
